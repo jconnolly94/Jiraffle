@@ -1,0 +1,17 @@
+.ant-layout {
+    background: #f0f2f5;
+  }
+  
+  .ant-card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+  }
+  
+  .payment-button {
+    margin-top: 24px;
+  }
+  
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+  }
