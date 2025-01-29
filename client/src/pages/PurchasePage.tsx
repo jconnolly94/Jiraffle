@@ -53,8 +53,6 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
         },
       });
     }
-
-    // Cleanup: remove the DOM node contents (optional)
     return () => {
       const sumUpCardDiv = document.getElementById('sumup-card');
       if (sumUpCardDiv) {
