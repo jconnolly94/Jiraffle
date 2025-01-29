@@ -15,7 +15,6 @@ const RaffleNumberGrid: React.FC<LineSelectionProps> = ({ selectedLines, onSelec
   const calculateTotal = (lines: number) =>
     lines >= BULK_LINE_COUNT ? lines * BULK_PRICE_PER_LINE : lines * PRICE_PER_LINE;
 
-
   return (
     <div style={{ textAlign: 'center' }}>
       <Typography.Title level={4} style={{ marginBottom: 24 }}>
