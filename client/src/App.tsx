@@ -1,5 +1,5 @@
 // client/src/App.tsx
-import { BrowserRouter as Router, Routes, Route, Link, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, Link, BrowserRouter } from 'react-router-dom';
 import { Layout, Menu, Button, Space, Typography } from 'antd';
 import { QrcodeOutlined, DashboardOutlined, LoginOutlined } from '@ant-design/icons';
 import PurchasePage from './pages/PurchasePage';
