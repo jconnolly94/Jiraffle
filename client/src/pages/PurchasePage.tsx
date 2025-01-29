@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Card } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import RaffleNumberGrid from '../components/RaffleNumberGrid';
-import SumUpService from '../services/SumUpService';
 import useSumUpScript from '../hooks/useSumUpScript';
+import axios from 'axios';
 
 interface PurchasePageProps {
   tableId?: string;
@@ -19,19 +19,18 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const totalAmount = selectedLines >= 5 ? selectedLines * 2 : selectedLines * 3;
 
-  // Create checkout when lines are selected and script is ready
+  // Call backend to create checkout
   useEffect(() => {
     const createCheckout = async () => {
       try {
-        const service = new SumUpService('your-access-token-here');
-        const response = await service.createCheckout({
+        const response = await axios.post('http://localhost:5001/create-checkout', {
           amount: totalAmount * 100,
           currency: 'EUR',
           pay_to_email: 'jconnolly94@me.com',
           description: `Table ${activeTableId} Raffle`,
           reference_id: `${activeTableId}_${uuidv4()}`,
         });
-        setCheckoutId(response.id);
+        setCheckoutId(response.data.id);
       } catch (error) {
         console.error('Checkout creation failed:', error);
       }
@@ -42,7 +41,7 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
     }
   }, [isScriptLoaded, selectedLines, totalAmount, activeTableId]);
 
-  // Initialize payment form when both script and checkout ID are ready
+  // Initialize payment form
   useEffect(() => {
     if (isScriptLoaded && checkoutId) {
       (window as any).SumUpCard.mount({
