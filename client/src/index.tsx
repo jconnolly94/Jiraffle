@@ -12,6 +12,11 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
+    <script
+      type="text/javascript"
+      src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"
+      async
+    ></script>
     <App />
   </React.StrictMode>
 );

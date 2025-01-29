@@ -12,11 +12,11 @@ const RaffleNumberGrid: React.FC<LineSelectionProps> = ({ selectedLines, onSelec
   const BULK_LINE_COUNT = 5;
   const BULK_PRICE_PER_LINE = 2;
 
-  const calculateTotal = (lines: number) => 
+  const calculateTotal = (lines: number) =>
     lines >= BULK_LINE_COUNT ? lines * BULK_PRICE_PER_LINE : lines * PRICE_PER_LINE;
 
-  const pricePerLine = selectedLines >= BULK_LINE_COUNT 
-    ? BULK_PRICE_PER_LINE 
+  const pricePerLine = selectedLines >= BULK_LINE_COUNT
+    ? BULK_PRICE_PER_LINE
     : PRICE_PER_LINE;
 
   return (
@@ -24,7 +24,7 @@ const RaffleNumberGrid: React.FC<LineSelectionProps> = ({ selectedLines, onSelec
       <Typography.Title level={4} style={{ marginBottom: 24 }}>
         Choose Your Raffle Lines
       </Typography.Title>
-      
+
       <Card
         style={{
           width: 300,
@@ -36,7 +36,7 @@ const RaffleNumberGrid: React.FC<LineSelectionProps> = ({ selectedLines, onSelec
       >
         <Space direction="vertical" size={16}>
           <Space>
-            <Button 
+            <Button
               shape="circle"
               size="large"
               onClick={() => onSelectLines(Math.max(1, selectedLines - 1))}
@@ -44,12 +44,12 @@ const RaffleNumberGrid: React.FC<LineSelectionProps> = ({ selectedLines, onSelec
             >
               -
             </Button>
-            
+
             <Typography.Text strong style={{ fontSize: 32, width: 60 }}>
               {selectedLines}
             </Typography.Text>
-            
-            <Button 
+
+            <Button
               shape="circle"
               size="large"
               onClick={() => onSelectLines(selectedLines + 1)}
@@ -57,11 +57,11 @@ const RaffleNumberGrid: React.FC<LineSelectionProps> = ({ selectedLines, onSelec
               +
             </Button>
           </Space>
-          
+
           <Typography.Title level={3} style={{ margin: 0 }}>
             Total: €{calculateTotal(selectedLines).toFixed(2)}
           </Typography.Title>
-          
+
           <Typography.Text type="secondary" style={{ fontSize: 16 }}>
             {selectedLines >= BULK_LINE_COUNT ? (
               <>
