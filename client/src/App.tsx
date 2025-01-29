@@ -1,5 +1,5 @@
 // client/src/App.tsx
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, BrowserRouter } from 'react-router-dom';
 import { Layout, Menu, Button, Space, Typography } from 'antd';
 import { QrcodeOutlined, DashboardOutlined, LoginOutlined } from '@ant-design/icons';
 import PurchasePage from './pages/PurchasePage';
@@ -15,7 +15,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <Router>
+    <BrowserRouter>
       <Layout style={{ minHeight: '100vh' }}>
         <Header style={{ padding: '0 24px', background: '#fff' }}>
           <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -64,7 +64,7 @@ function App() {
           Jiraffle Raffle System ©{new Date().getFullYear()} • Built with Ant Design
         </Footer>
       </Layout>
-    </Router>
+    </BrowserRouter>
   );
 }
 
