@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,14 +17,12 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
 
   const [selectedLines, setSelectedLines] = useState(0);
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
-  const totalAmount = selectedLines >= 5 ? selectedLines * 2 : selectedLines * 3;
-
-  // Add these states
-  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<any>({});
 
-  // Modify the createCheckout function
-  const createCheckout = async () => {
+  const totalAmount = selectedLines >= 5 ? selectedLines * 2 : selectedLines * 3;
+
+  // Wrap createCheckout in useCallback
+  const createCheckout = useCallback(async () => {
     try {
       const payload = {
         amount: totalAmount * 100,
@@ -35,7 +33,7 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
       };
 
       console.log('Sending payload:', payload);
-      // With:
+
       const response = await axios.post(
         process.env.REACT_APP_API_URL + '/create-checkout',
         payload
@@ -47,34 +45,40 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
       setCheckoutId(response.data.id);
       setDebugInfo({
         request: payload,
-        response: response.data
+        response: response.data,
       });
-
     } catch (error) {
       console.error('Full client error:', error);
       if (axios.isAxiosError(error)) {
         setDebugInfo({
           error: error.response?.data || error.message,
-          config: error.config
+          config: error.config,
         });
       } else {
         setDebugInfo({
           error: (error as Error).message,
         });
       }
-      const errorMessage = axios.isAxiosError(error) ? error.response?.data?.error || error.message : (error as Error).message;
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.error || error.message
+        : (error as Error).message;
       alert(`Payment failed: ${errorMessage}`);
     }
-  };
+  }, [activeTableId, totalAmount]);
+
+  // Log debug info if needed so the variable is used
+  useEffect(() => {
+    if (Object.keys(debugInfo).length > 0) {
+      console.log('Debug Info:', debugInfo);
+    }
+  }, [debugInfo]);
 
   // Call backend to create checkout
   useEffect(() => {
-
-
     if (isScriptLoaded && selectedLines > 0 && totalAmount > 0) {
       createCheckout();
     }
-  }, [isScriptLoaded, selectedLines, totalAmount, activeTableId]);
+  }, [isScriptLoaded, selectedLines, totalAmount, activeTableId, createCheckout]);
 
   // Initialize payment form
   useEffect(() => {
