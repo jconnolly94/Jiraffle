@@ -1,38 +1,48 @@
-// server/server.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const axios = require('axios');
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      // List of allowed origins
+      const allowedOrigins = [
+        'http://localhost:3000', // Local development
+        'https://jiraffle.jconnolly.tech', // Production frontend
+      ];
+
+      // Check if the origin is allowed
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Allow cookies and credentials
+  })
+);
 app.use(express.json());
 
-
-const SUMUP_CLIENT_ID = process.env.SUMUP_CLIENT_ID;
-const SUMUP_CLIENT_SECRET = process.env.SUMUP_CLIENT_SECRET;
-const SUMUP_ACCESS_TOKEN = process.env.SUMUP_ACCESS_TOKEN;
-
+// Create checkout endpoint
 app.post('/create-checkout', async (req, res) => {
   try {
-    const { amount, currency, pay_to_email, description, reference_id } = req.body;
-    
-    // Create checkout on SumUp
     const response = await axios.post(
       'https://api.sumup.com/v0.1/checkouts',
       {
-        amount,
-        currency,
-        pay_to_email,
-        description,
-        reference_id,
-        return_url: 'https://jiraffle.jconnolly.tech/confirmation', 
+        ...req.body,
+        merchant_code: process.env.SUMUP_MERCHANT_CODE,
       },
       {
         headers: {
-          Authorization: `Bearer ${SUMUP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${process.env.SUMUP_API_KEY}`,
           'Content-Type': 'application/json',
         },
       }
@@ -40,11 +50,13 @@ app.post('/create-checkout', async (req, res) => {
     
     res.json(response.data);
   } catch (error) {
-    console.error('Error creating checkout:', error);
-    res.status(500).json({ error: 'Failed to create checkout' });
+    console.error('Checkout error:', error.response?.data || error.message);
+    res.status(500).json({
+      error: 'Payment initialization failed',
+      details: error.response?.data || error.message,
+    });
   }
 });
-
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI)

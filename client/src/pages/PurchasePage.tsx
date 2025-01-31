@@ -14,7 +14,7 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
   const { tableId: paramId } = useParams<{ tableId: string }>();
   const activeTableId = tableId || paramId;
   const isScriptLoaded = useSumUpScript();
-  
+
   const [selectedLines, setSelectedLines] = useState(0);
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const totalAmount = selectedLines >= 5 ? selectedLines * 2 : selectedLines * 3;
@@ -23,20 +23,21 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
   useEffect(() => {
     const createCheckout = async () => {
       try {
-        const response = await axios.post('http://localhost:5001/create-checkout', {
+        const response = await axios.post('/create-checkout', {
           amount: totalAmount * 100,
           currency: 'EUR',
-          pay_to_email: 'jconnolly94@me.com',
           description: `Table ${activeTableId} Raffle`,
-          reference_id: `${activeTableId}_${uuidv4()}`,
+          checkout_reference: `${activeTableId}_${uuidv4()}`,
+          return_url: window.location.origin + '/confirmation',
         });
         setCheckoutId(response.data.id);
       } catch (error) {
         console.error('Checkout creation failed:', error);
+        alert('Failed to initialize payment. Please try again.');
       }
     };
 
-    if (isScriptLoaded && selectedLines > 0) {
+    if (isScriptLoaded && selectedLines > 0 && totalAmount > 0) {
       createCheckout();
     }
   }, [isScriptLoaded, selectedLines, totalAmount, activeTableId]);
