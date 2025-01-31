@@ -19,23 +19,57 @@ const PurchasePage: React.FC<PurchasePageProps> = ({ tableId }) => {
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
   const totalAmount = selectedLines >= 5 ? selectedLines * 2 : selectedLines * 3;
 
+  // Add these states
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>({});
+
+  // Modify the createCheckout function
+  const createCheckout = async () => {
+    try {
+      const payload = {
+        amount: totalAmount * 100,
+        currency: 'EUR',
+        description: `Table ${activeTableId} Raffle`,
+        checkout_reference: `${activeTableId}_${uuidv4()}`,
+        return_url: window.location.origin + '/confirmation',
+      };
+
+      console.log('Sending payload:', payload);
+      // With:
+      const response = await axios.post(
+        process.env.REACT_APP_API_URL + '/create-checkout',
+        payload
+      );
+      if (!response.data.id) {
+        throw new Error('Invalid checkout ID');
+      }
+
+      setCheckoutId(response.data.id);
+      setDebugInfo({
+        request: payload,
+        response: response.data
+      });
+
+    } catch (error) {
+      console.error('Full client error:', error);
+      if (axios.isAxiosError(error)) {
+        setDebugInfo({
+          error: error.response?.data || error.message,
+          config: error.config
+        });
+      } else {
+        setDebugInfo({
+          error: (error as Error).message,
+        });
+      }
+      const errorMessage = axios.isAxiosError(error) ? error.response?.data?.error || error.message : (error as Error).message;
+      alert(`Payment failed: ${errorMessage}`);
+    }
+  };
+
   // Call backend to create checkout
   useEffect(() => {
-    const createCheckout = async () => {
-      try {
-        const response = await axios.post('/create-checkout', {
-          amount: totalAmount * 100,
-          currency: 'EUR',
-          description: `Table ${activeTableId} Raffle`,
-          checkout_reference: `${activeTableId}_${uuidv4()}`,
-          return_url: window.location.origin + '/confirmation',
-        });
-        setCheckoutId(response.data.id);
-      } catch (error) {
-        console.error('Checkout creation failed:', error);
-        alert('Failed to initialize payment. Please try again.');
-      }
-    };
+
 
     if (isScriptLoaded && selectedLines > 0 && totalAmount > 0) {
       createCheckout();

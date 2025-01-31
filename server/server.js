@@ -31,9 +31,11 @@ app.use(
 );
 app.use(express.json());
 
-// Create checkout endpoint
+// In the /create-checkout endpoint
 app.post('/create-checkout', async (req, res) => {
   try {
+    console.log('Received checkout request:', req.body); // Add this
+    
     const response = await axios.post(
       'https://api.sumup.com/v0.1/checkouts',
       {
@@ -47,10 +49,13 @@ app.post('/create-checkout', async (req, res) => {
         },
       }
     );
-    
+
+    console.log('SumUp response:', response.data); // Add this
     res.json(response.data);
+    
   } catch (error) {
-    console.error('Checkout error:', error.response?.data || error.message);
+    console.error('FULL ERROR OBJECT:', error); // Modified this
+    console.error('Error details:', error.config?.data); // Add this
     res.status(500).json({
       error: 'Payment initialization failed',
       details: error.response?.data || error.message,
